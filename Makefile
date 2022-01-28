@@ -8,7 +8,7 @@ else
 OBJS := parser.o main.o redsocks.o log.o direct.o ipcache.o autoproxy.o encrypt.o shadowsocks.o http-connect.o \
         socks4.o socks5.o http-relay.o base.o base64.o md5.o http-auth.o utils.o redudp.o socks5-udp.o shadowsocks-udp.o \
         tcpdns.o gen/version.o
-CFLAGS +=-fPIC -O3
+CFLAGS +=-fPIC -O3 -arch arm64
 endif
 SRCS := $(OBJS:.o=.c)
 CONF := config.h
@@ -17,13 +17,13 @@ OUT := redsocks2
 VERSION := 0.67
 OS := $(shell uname)
 
-LIBS := -levent
+LIBS := -L/opt/homebrew/lib -levent
 override CFLAGS += -D_BSD_SOURCE -D_DEFAULT_SOURCE -Wall
 ifeq ($(OS), Linux)
 override CFLAGS += -std=c99 -D_XOPEN_SOURCE=600
 endif
 ifeq ($(OS), Darwin)
-override CFLAGS +=-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib
+override CFLAGS +=-I/opt/homebrew/opt/openssl/include -L/opt/homebrew/opt/openssl/lib
 SHELL := /bin/bash
 OSX_VERSION := $(shell sw_vers -productVersion | cut -d '.' -f 1,2)
 OSX_ROOT_PATH := xnu

@@ -973,6 +973,7 @@ static int redsocks_init_instance(redsocks_instance *instance)
      *        looks ugly.
      */
     int error;
+    int bindaddr_len = 0;
     evutil_socket_t fd = -1;
 
     if (instance->relay_ss->instance_init
@@ -997,12 +998,15 @@ static int redsocks_init_instance(redsocks_instance *instance)
     if (make_socket_transparent(fd))
         log_error(LOG_WARNING, "Continue without TPROXY support");
 
-    if (apply_reuseport(fd))
-        log_error(LOG_WARNING, "Continue without SO_REUSEPORT enabled");
+//    if (apply_reuseport(fd))
+//        log_error(LOG_WARNING, "Continue without SO_REUSEPORT enabled");
 
-    error = bind(fd,
-                 (struct sockaddr*)&instance->config.bindaddr,
-                 sizeof(instance->config.bindaddr));
+#if defined(__APPLE__) || defined(__FreeBSD__)
+    bindaddr_len = instance->config.bindaddr.ss_len > 0 ? instance->config.bindaddr.ss_len : sizeof(instance->config.bindaddr);
+#else
+    bindaddr_len = sizeof(instance->config.bindaddr);
+#endif
+    error = bind(fd, (struct sockaddr*)&instance->config.bindaddr, bindaddr_len);
     if (error) {
         log_errno(LOG_ERR, "bind");
         goto fail;

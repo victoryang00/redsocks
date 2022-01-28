@@ -508,7 +508,7 @@ int make_socket_transparent(int fd)
     error = setsockopt(fd, SOL_IP, IP_TRANSPARENT, &on, sizeof(on));
     if (error)
         log_errno(LOG_DEBUG, "setsockopt(fd, SOL_IP, IP_TRANSPARENT)");
-    if (error && error_6) {
+    if (error) {
         log_error(LOG_ERR, "Can not make socket transparent. See debug log for details.");
         return error;
     }
